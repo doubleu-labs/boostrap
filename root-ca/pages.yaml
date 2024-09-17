@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow
+---
+name: Pages
+on:
+  push:
+    branches:
+    - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    # (Optional) Convert the README to an index.html with Github styling
+    # This will automatically create a dist outupt directory
+    - uses: wranders/markdown-to-pages-action@v0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    # (Optional) If the above workflow is not used, create the output directory
+    - run: mkdir dist
+
+    # Copy the certificate and CRL to the output directory
+    # Also copy any other files that should be available on the published site
+    - run: cp *.{crl,crt} CNAME dist/
+
+    # Package and upload the output directory as a Pages artifact
+    - uses: actions/upload-pages-artifact@v3
+      with:
+        path: dist
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deplotment.outputs.page_url }}
+    steps:
+    - uses: actions/deploy-pages@v1
+      id: deployment
