@@ -43,6 +43,7 @@ fullname = URI:$CDPURL
 
 [root_ca_ext]
 keyUsage               = critical,keyCertSign,cRLSign
+basicConstraints       = critical,CA:true
 subjectKeyIdentifier   = hash
 authorityKeyIdentifier = keyid:always
 
