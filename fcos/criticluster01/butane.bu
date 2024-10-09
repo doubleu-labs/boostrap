@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+---
+variant: fcos
+version: 1.5.0
+ignition:
+  config:
+    merge:
+    - local: fcos/common/k3s.ignition.ign
+    - local: fcos/common/network.ignition.ign
+    - local: fcos/common/passwd.ignition.ign
+    - local: fcos/common/sshd.ignition.ign
+    - local: fcos/common/var-disk.ignition.ign
+storage:
+  files:
+  - path: /etc/hostname
+    mode: 0644
+    contents:
+      inline: criticluster01
+  - path: /etc/NetworkManager/system-connections/end0.2.nmconnection
+    mode: 0600
+    contents:
+      inline: |
+        [connection]
+        id=end0.2
+        type=vlan
+        interface-name=end0.2
+        [vlan]
+        id=2
+        parent=end0
+        flags=1
+        [ipv4]
+        method=manual
+        address1=10.0.2.10/24,10.0.2.1
+        dns=10.0.0.10;10.0.0.11;
+        [ipv6]
+        method=auto
+  - path: /etc/rancher/k3s/config.yaml
+    contents:
+      inline: |
+        advertise-address: "10.0.2.10"
+        cluster-init: true
+        disable:
+        - localstorage
+        - servicelb
+        - traefik
+        node-name: criticluster01
+        tls-san:
+        - "criticluster01"
+        - "criticluster01.mgmt.home.doubleu.codes"
+        write-kubeconfig-mode: "0644"
+  - path: /var/lib/rancher/k3s/server/manifests/metallb.yaml
+    mode: 0644
+    contents:
+      local: k3s/manifests/metallb.yaml
+  - path: /var/lib/rancher/k3s/server/manifests/tempdns.yaml
+    mode: 0644
+    contents:
+      local: k3s/manifests/tempdns.yaml

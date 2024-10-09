@@ -1,0 +1,65 @@
+# Ignore everything by default.
+# This repository is designed to be the working deployment directory, so only
+#   keep files that are explicitly specified.
+# Empty directories intended to stage needed files include a .gitkeep file to
+#   ensure the destination directory exists when cloned.
+# This file prevents having to litter the repository with individual .gitignore
+#   files.
+*
+
+!.gitignore
+!README.md
+
+!.download/
+!.download/.gitkeep
+
+!fcos/
+!fcos/common/
+!fcos/common/k3s.butane.bu
+!fcos/common/network.butane.bu
+!fcos/common/passwd.butane.bu.tpl
+!fcos/common/sshd.butane.bu
+!fcos/common/var-disk.butane.bu
+!fcos/criticluster0[1-3]/
+!fcos/criticluster0[1-3]/butane.bu
+!fcos/oobm-srv/
+!fcos/oobm-srv/butane.bu.tpl
+!fcos/oobm-srv/dnsmasq.conf
+!fcos/oobm-srv/pct6248.cfg
+!fcos/oobm-srv/pss4810.cfg
+
+!k3s/
+!k3s/init/
+!k3s/init/.gitkeep
+!k3s/manifests/
+!k3s/manifests/metallb.yaml.tpl
+!k3s/manifests/tempdns.yaml
+!k3s/packages/
+!k3s/packages/.gitkeep
+!k3s/system/
+!k3s/system/.gitkeep
+
+!raspberry-pi/
+!raspberry-pi/partial.config.txt
+!raspberry-pi/uboot/
+!raspberry-pi/uboot/root/
+!raspberry-pi/uboot/root/.gitkeep
+!raspberry-pi/uboot/rpm/
+!raspberry-pi/uboot/rpm/.gitkeep
+
+!root-ca/
+!root-ca/openssl.cnf.tpl
+!root-ca/pages.yaml
+!root-ca/pkcs11.cnf
+
+!step-ca/
+!step-ca/intermediate_ca.conf
+!step-ca/ca/
+!step-ca/ca/passwords/
+!step-ca/ca/passwords/.gitkeep
+!step-ca/client/
+!step-ca/client/.gitkeep
+!step-ca/templates/
+!step-ca/templates/template_ssh.tpl
+!step-ca/templates/issuer_template_x509.data.tpl
+!step-ca/templates/issuer_template_x509.tpl

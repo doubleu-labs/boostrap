@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+---
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+  - path: /etc/yum.repos.d/rancher-k3s-common.repo
+    contents:
+      inline: |
+        [rancher-k3s-common-stable]
+        name=Rancher K3s Common (stable)
+        baseurl=https://rpm.rancher.io/k3s/stable/common/coreos/noarch
+        enabled=1
+        gpgcheck=1
+        repo_gpgcheck=0
+        gpgkey=https://rpm.rancher.io/public.key
+systemd:
+  units:
+  - name: var-mnt-k3s.mount
+    contents: |
+      [Unit]
+      Description=Mount K3s ASSETS
+      [Mount]
+      What=/dev/disk/by-label/ASSETS
+      Where=/var/mnt/ASSETS
+      Type=vfat
+      Options=ro
+      [Install]
+      WantedBy=multi-user.target
+  - name: var-mnt-k3s.automount
+    enabled: true
+    contents: |
+      [Unit]
+      Description=Mount K3s ASSETS Automatically
+      [Automount]
+      Where=/var/mnt/ASSETS
+      [Install]
+      WantedBy=multi-user.target
+  - name: k3s-copy-assets.service
+    enabled: true
+    contents: |
+      [Unit]
+      Description=Copy K3s Assets
+      Wants=mnt-var-k3s.mount
+      ConditionPathExists=!/var/lib/%N.stamp
+      [Service]
+      Type=oneshot
+      RemainAfterExit=true
+      ExecStartPre=/usr/bin/mkdir -p /var/lib/rancher/k3s/agent/images
+      ExecStart=/usr/bin/install /var/mnt/ASSETS/k3s-airgap-images-arm64.tar.zst /var/lib/rancher/k3s/agent/images/
+      ExecStart=/usr/bin/install /var/mnt/ASSETS/k3s /usr/local/bin/
+      ExecStart=/usr/bin/install -T /var/mnt/ASSETS/install.sh /usr/local/bin/k3s-install
+      ExecStartPost=/usr/bin/bash -c "/usr/local/bin/k3s completion bash > /etc/bash_completion.d/k3s.sh"
+      ExecStartPost=/usr/bin/touch /var/lib/%N.stamp
+      [Install]
+      WantedBy=multi-user.target
+  - name: k3s-install-selinux.service
+    enabled: true
+    contents: |
+      [Unit]
+      Description=Install k3s-selinux Package
+      After=coreos-ignition-firstboot-complete.service
+      Before=systemd-user-sessions.service
+      ConditionPathExists=!/var/lib/%N.stamp
+      [Service]
+      Type=oneshot
+      RemainAfterExit=true
+      StandardError=kmsg+console
+      StandardOutput=kmsg+console
+      ExecStart=/usr/bin/rpm-ostree install -Cy /var/mnt/ASSETS/k3s-selinux.rpm
+      ExecStartPost=/usr/bin/touch /var/lib/%N.stamp
+      ExecStartPost=/usr/bin/systemctl --no-block reboot
+      [Install]
+      WantedBy=basic.target
+  - name: k3s-init.service
+    enabled: true
+    contents: |
+      [Unit]
+      Description=Initialize K3s Cluster
+      ConditionPathExists=!/etc/rancher/node/
+      ConditionPathExists=!/var/lib/rancher/k3s/data/
+      [Service]
+      Type=oneshot
+      RemainAfterExit=true
+      Environment="INSTALL_K3S_SKIP_DOWNLOAD=true"
+      Environment="INSTALL_K3S_SKIP_SELINUX_RPM=true"
+      ExecStart=/usr/local/bin/k3s-install
+      [Install]
+      WantedBy=multi-user.target

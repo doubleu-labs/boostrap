@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+---
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+  - path: /etc/NetworkManager/system-connections/end0.nmconnection
+    mode: 0600
+    contents:
+      inline: |
+        [connection]
+        id=end0
+        type=ethernet
+        interface-name=end0
+        [ipv4]
+        address1=10.0.0.0/24
+        method=manual
+        [ipv6]
+        method=auto
+  - path: /etc/NetworkManager/system-connections/end0.3.nmconnection
+    mode: 0600
+    contents:
+      inline: |
+        [connection]
+        id=end0.3
+        type=vlan
+        interface-name=end0.3
+        [vlan]
+        id=3
+        parent=end0
+        flags=1
+        [ipv4]
+        address1=10.0.3.0/24
+        method=manual
+        [ipv6]
+        method=auto

@@ -1,0 +1,4 @@
+dtparam=i2c_arm=on
+dtoverlay=i2c-rtc,ds3231
+dtoverlay=disable-bt
+dtoverlay=disable-wifi

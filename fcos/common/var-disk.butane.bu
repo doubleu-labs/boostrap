@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+---
+variant: fcos
+version: 1.5.0
+storage:
+  disks:
+  - device: /dev/sda
+    wipe_table: true
+    partitions:
+    - number: 1
+      wipe_partition_entry: true
+      label: var
+  filesystems:
+  - path: /var
+    device: /dev/disk/by-partlabel/var
+    format: xfs
+    wipe_filesystem: true
+    with_mount_unit: true

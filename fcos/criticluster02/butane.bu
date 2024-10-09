@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+---
+variant: fcos
+version: 1.5.0
+ignition:
+  config:
+    merge:
+    - local: fcos/common/k3s.ignition.ign
+    - local: fcos/common/network.ignition.ign
+    - local: fcos/common/passwd.ignition.ign
+    - local: fcos/common/sshd.ignition.ign
+    - local: fcos/common/var-disk.ignition.ign
+storage:
+  files:
+  - path: /etc/hostname
+    mode: 0644
+    contents:
+      inline: criticluster02
+  - path: /etc/NetworkManager/system-connections/end0.2.nmconnection
+    mode: 0600
+    contents:
+      inline: |
+        [connection]
+        id=end0.2
+        type=vlan
+        interface-name=end0.2
+        [vlan]
+        id=2
+        parent=end0
+        flags=1
+        [ipv4]
+        method=manual
+        address1=10.0.2.11/24,10.0.2.1
+        dns=10.0.0.10;10.0.0.11;
+        [ipv6]
+        method=auto
